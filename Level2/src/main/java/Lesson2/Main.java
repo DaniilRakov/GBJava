@@ -18,26 +18,25 @@ public class Main {
             int sum = processArray(array);
             System.out.println("Сумма чисел равна " + sum);
         } catch (MyArraySizeException e) {
-            System.out.println(e.fillInStackTrace());
+            e.printStackTrace(System.out);
         } catch (MyArrayDataException e) {
-            System.out.println(e.fillInStackTrace());
+            e.printStackTrace(System.out);
         }
-
     }
 
     private static int processArray(String[][] array) throws MyArraySizeException {
         if (array.length != 4)
             throw new MyArraySizeException("Некорректный размер массива - " + array.length + " строк");
-        for (int i = 0; i < array.length; i++) {
-            if (array[i].length != 4)
-                throw new MyArraySizeException("Некорректный размер массива - " + array[i].length + " столбцов");
+        for (String[] strings : array) {
+            if (strings.length != 4)
+                throw new MyArraySizeException("Некорректный размер массива - " + strings.length + " столбцов");
         }
 
         int sum = 0;
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array[i].length; j++) {
                 try {
-                    sum += Integer.valueOf(array[i][j]);
+                    sum += Integer.parseInt(array[i][j]);
                 } catch (Exception e) {
                     throw new MyArrayDataException("В ячейке с координатами " + i + ","
                             + j + " находятся некорректные данные");
