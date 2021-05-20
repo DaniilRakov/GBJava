@@ -1,28 +1,22 @@
 package Lesson3;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class PhoneBook {
-    private Map<String, ArrayList<String>> phoneBook;
+    private final Map<String, List<String>> phoneBook;
 
     public PhoneBook() {
-        this.phoneBook = new HashMap<String, ArrayList<String>>();
+        this.phoneBook = new HashMap<>();
     }
 
     public void add(String surname, String phoneNumber) {
-        ArrayList<String> list;
-        if (phoneBook.containsKey(surname)) {
-            list = phoneBook.get(surname);
-        } else {
-            list = new ArrayList<String>();
-        }
+        List<String> list = phoneBook.getOrDefault(surname, new ArrayList<>());
+
         list.add(phoneNumber);
         phoneBook.put(surname, list);
     }
 
-    public ArrayList<String> get(String surname) {
-        return phoneBook.get(surname);
+    public List<String> get(String surname) {
+        return phoneBook.getOrDefault(surname, Collections.emptyList());
     }
 }

@@ -31,7 +31,7 @@ public class Main {
         phoneBook.add(surname2, "8 (234) 567-89-01");
         phoneBook.add(surname3, "8 (345) 678-90-12");
 
-        ArrayList<String> phoneNumbers = phoneBook.get(surname);
+        List<String> phoneNumbers = phoneBook.get(surname);
         System.out.println("Фамилия - " + surname);
         for (String phoneNumber : phoneNumbers) {
             System.out.println("Телефонный номер - " + phoneNumber);
@@ -39,16 +39,10 @@ public class Main {
     }
 
     private static Map<String, Integer> getUniqueWords(String[] inputArray) {
-        Map<String, Integer> outMap = new HashMap<String, Integer>();
+        Map<String, Integer> outMap = new HashMap<>();
 
-        for (String s : inputArray) {
-            if (!outMap.containsKey(s)) {
-                outMap.put(s, 1);
-            } else {
-                int a = outMap.get(s);
-                outMap.put(s, ++a);
-            }
-        }
+        for (String surname : inputArray)
+            outMap.put(surname, outMap.getOrDefault(surname, 0) + 1);
 
         return outMap;
     }
