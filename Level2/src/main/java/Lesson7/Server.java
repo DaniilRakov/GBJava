@@ -36,25 +36,25 @@ public class Server {
     }
 
     public synchronized boolean isNickBusy(String nick) {
-        for (ClientHandler o : clients) {
-            if (o.getName().equals(nick)) {
+        for (ClientHandler clientHandler : clients) {
+            if (clientHandler.getName().equals(nick)) {
                 return true;
             }
         }
         return false;
     }
 
-    public synchronized void broadcastMsg(String msg) {
-        for (ClientHandler o : clients) {
-            o.sendMsg(msg);
+    public synchronized void broadcastMsg(String message) {
+        for (ClientHandler clientHandler : clients) {
+            clientHandler.sendMsg(message);
         }
     }
 
-    public synchronized void unsubscribe(ClientHandler o) {
-        clients.remove(o);
+    public synchronized void unsubscribe(ClientHandler clientHandler) {
+        clients.remove(clientHandler);
     }
 
-    public synchronized void subscribe(ClientHandler o) {
-        clients.add(o);
+    public synchronized void subscribe(ClientHandler clientHandler) {
+        clients.add(clientHandler);
     }
 }

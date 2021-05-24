@@ -8,8 +8,8 @@ import java.net.Socket;
 public class ClientHandler {
     private final Server server;
     private final Socket socket;
-    private final DataInputStream in;
-    private final DataOutputStream out;
+    private final DataInputStream inputStream;
+    private final DataOutputStream outputStream;
 
     private String name;
 
@@ -21,8 +21,8 @@ public class ClientHandler {
         try {
             this.server = server;
             this.socket = socket;
-            this.in = new DataInputStream(socket.getInputStream());
-            this.out = new DataOutputStream(socket.getOutputStream());
+            this.inputStream = new DataInputStream(socket.getInputStream());
+            this.outputStream = new DataOutputStream(socket.getOutputStream());
             this.name = "";
             new Thread(() -> {
                 try {
@@ -41,13 +41,13 @@ public class ClientHandler {
 
     public void authentication() throws IOException {
         while (true) {
-            String str = in.readUTF();
-            if (str.startsWith("/auth")) {
+            String str = inputStream.readUTF();
+            if (str.startsWith(Constants.AUTH)) {
                 String[] parts = str.split("\\s");
                 String nick = server.getAuthService().getNickByLoginPass(parts[1], parts[2]);
                 if (nick != null) {
                     if (!server.isNickBusy(nick)) {
-                        sendMsg("/auth_ok " + nick);
+                        sendMsg(Constants.AUTH_OK + nick);
                         name = nick;
                         server.broadcastMsg(name + " зашел в чат");
                         server.subscribe(this);
@@ -64,9 +64,9 @@ public class ClientHandler {
 
     public void readMessages() throws IOException {
         while (true) {
-            String strFromClient = in.readUTF();
+            String strFromClient = inputStream.readUTF();
             System.out.println("от " + name + ": " + strFromClient);
-            if (strFromClient.equals("/end")) {
+            if (strFromClient.equals(Constants.STOP_WORD)) {
                 return;
             }
             server.broadcastMsg(name + ": " + strFromClient);
@@ -75,7 +75,7 @@ public class ClientHandler {
 
     public void sendMsg(String msg) {
         try {
-            out.writeUTF(msg);
+            outputStream.writeUTF(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -85,12 +85,12 @@ public class ClientHandler {
         server.unsubscribe(this);
         server.broadcastMsg(name + " вышел из чата");
         try {
-            in.close();
+            inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
         try {
-            out.close();
+            outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -38,8 +38,8 @@ public class BaseAuthService implements AuthService {
 
     @Override
     public String getNickByLoginPass(String login, String pass) {
-        for (Entry o : entries) {
-            if (o.login.equals(login) && o.pass.equals(pass)) return o.nick;
+        for (Entry entry : entries) {
+            if (entry.login.equals(login) && entry.pass.equals(pass)) return entry.nick;
         }
         return null;
     }
