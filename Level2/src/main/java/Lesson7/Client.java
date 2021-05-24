@@ -11,7 +11,7 @@ import java.net.Socket;
 
 public class Client extends JFrame {
 
-    private static String connectionStatus;
+    private static String connectionMessage;
 
     private JTextField msgInputField;
     private JTextArea chatArea;
@@ -32,21 +32,23 @@ public class Client extends JFrame {
     public void openConnection() throws IOException {
         try {
             socket = new Socket(Constants.SERVER_ADDRESS, Constants.SERVER_PORT);
-            connectionStatus = "Подключение успешно";
+            connectionMessage = Constants.GOOD_CONNECTION;
         } catch (Exception ex) {
-            connectionStatus = "Не удалось подключиться к серверу";
+            connectionMessage = Constants.BAD_CONNECTION;
             return;
         }
         inputStream = new DataInputStream(socket.getInputStream());
         outputStream = new DataOutputStream(socket.getOutputStream());
+
+        // Поток чтения сообщений
         new Thread(() -> {
             try {
                 while (true) {
                     String strFromServer = inputStream.readUTF();
-                    if (strFromServer.equalsIgnoreCase(Constants.STOP_WORD)) {
+                    chatArea.append(strFromServer + "\n");
+                    if (strFromServer.toLowerCase().startsWith(Constants.STOP_WORD)) {
                         break;
                     }
-                    chatArea.append(strFromServer + "\n");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -78,9 +80,11 @@ public class Client extends JFrame {
                 outputStream.writeUTF(msgInputField.getText());
                 msgInputField.setText("");
                 msgInputField.grabFocus();
-            } catch (IOException | NullPointerException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Ошибка отправки сообщения");
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, Constants.SEND_MSG_ERROR);
+            } catch (NullPointerException exception) {
+                exception.printStackTrace();
+                JOptionPane.showMessageDialog(this, Constants.SEND_MSG_ERROR);
             }
         }
     }
@@ -96,7 +100,7 @@ public class Client extends JFrame {
         chatArea.setEditable(false);
         chatArea.setLineWrap(true);
         add(new JScrollPane(chatArea), BorderLayout.CENTER);
-        chatArea.append(connectionStatus + "\n");
+        chatArea.append(connectionMessage + "\n");
 
         // Нижняя панель с полем для ввода сообщений и кнопкой отправки сообщений
         JPanel bottomPanel = new JPanel(new BorderLayout());

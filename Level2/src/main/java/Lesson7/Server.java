@@ -50,6 +50,16 @@ public class Server {
         }
     }
 
+    public synchronized boolean directMsg(String message, String recipient) {
+        for (ClientHandler clientHandler : clients) {
+            if (clientHandler.getName().equals(recipient)) {
+                clientHandler.sendMsg(message);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public synchronized void unsubscribe(ClientHandler clientHandler) {
         clients.remove(clientHandler);
     }
