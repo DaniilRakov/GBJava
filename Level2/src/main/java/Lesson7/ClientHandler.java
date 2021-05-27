@@ -67,9 +67,7 @@ public class ClientHandler {
             String strFromClient = inputStream.readUTF();
             System.out.println(name + ": " + strFromClient);
 
-            if (strFromClient.toLowerCase().startsWith(Constants.STOP_WORD)) {
-                return;
-            }
+            if (strFromClient.toLowerCase().startsWith(Constants.STOP_WORD)) return;
 
             if (strFromClient.toLowerCase().startsWith(Constants.WHISPERING)) {
                 String[] parts = strFromClient.split("\\s");
