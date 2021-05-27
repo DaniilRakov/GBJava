@@ -74,11 +74,11 @@ public class ClientHandler {
             if (strFromClient.toLowerCase().startsWith(Constants.WHISPERING)) {
                 String[] parts = strFromClient.split("\\s");
                 String message = strFromClient.substring(3 + parts[1].length());
-                boolean sendSuccess = server.directMsg("[" + name + "] шепчет: " + message, parts[1]);
-                if (!sendSuccess)
-                    sendMsg(Constants.NO_USER);
+                String fullMessage = "[" + name + "] шепчет [" + parts[1] + "]:" + message;
+                boolean sendSuccess = server.directMsg(fullMessage, parts[1]);
+                sendMsg(sendSuccess ? fullMessage : Constants.NO_USER);
             } else
-                server.broadcastMsg("[" + name + "]: " + strFromClient);
+                server.broadcastMsg("[" + name + "]:  " + strFromClient);
         }
     }
 
