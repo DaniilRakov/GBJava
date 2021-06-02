@@ -47,16 +47,16 @@ public class ClientHandler {
                 String nick = server.getAuthService().getNickByLoginPass(parts[1], parts[2]);
                 if (nick != null) {
                     if (!server.isNickBusy(nick)) {
-                        sendMsg(Constants.AUTH_OK + nick);
+                        sendMessage(Constants.AUTH_OK + nick);
                         name = nick;
-                        server.broadcastMsg(name + " вошёл в чат");
+                        server.broadcastMessage(name + " вошёл в чат");
                         server.subscribe(this);
                         return;
                     } else {
-                        sendMsg("Учетная запись уже используется");
+                        sendMessage("Учетная запись уже используется");
                     }
                 } else {
-                    sendMsg("Неверные логин/пароль");
+                    sendMessage("Неверные логин/пароль");
                 }
             }
         }
@@ -73,14 +73,14 @@ public class ClientHandler {
                 String[] parts = strFromClient.split("\\s");
                 String message = strFromClient.substring(3 + parts[1].length());
                 String fullMessage = "[" + name + "] шепчет [" + parts[1] + "]:" + message;
-                boolean sendSuccess = server.directMsg(fullMessage, parts[1]);
-                sendMsg(sendSuccess ? fullMessage : Constants.NO_USER);
+                boolean sendSuccess = server.directMessage(fullMessage, parts[1]);
+                sendMessage(sendSuccess ? fullMessage : Constants.NO_USER);
             } else
-                server.broadcastMsg("[" + name + "]:  " + strFromClient);
+                server.broadcastMessage("[" + name + "]:  " + strFromClient);
         }
     }
 
-    public void sendMsg(String msg) {
+    public void sendMessage(String msg) {
         try {
             outputStream.writeUTF(msg);
         } catch (IOException e) {
@@ -89,7 +89,7 @@ public class ClientHandler {
     }
 
     public void closeConnection() {
-        server.broadcastMsg(name + " вышел из чата");
+        server.broadcastMessage(name + " вышел из чата");
         server.unsubscribe(this);
         try {
             inputStream.close();

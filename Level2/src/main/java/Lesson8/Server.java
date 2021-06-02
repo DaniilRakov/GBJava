@@ -44,16 +44,21 @@ public class Server {
         return false;
     }
 
-    public synchronized void broadcastMsg(String message) {
-        for (ClientHandler clientHandler : clients) {
-            clientHandler.sendMsg(message);
-        }
+    public synchronized void broadcastMessage(String message) {
+        clients.forEach(client -> client.sendMessage(message));
     }
 
-    public synchronized boolean directMsg(String message, String recipient) {
+    public synchronized void broadcastMessageToSeveralClients(String message, List<String> nicknames) {
+        clients.forEach(clientHandler -> {
+            if (nicknames.contains(clientHandler.getName()))
+                clientHandler.sendMessage(message);
+        });
+    }
+
+    public synchronized boolean directMessage(String message, String recipient) {
         for (ClientHandler clientHandler : clients) {
             if (clientHandler.getName().equals(recipient)) {
-                clientHandler.sendMsg(message);
+                clientHandler.sendMessage(message);
                 return true;
             }
         }
