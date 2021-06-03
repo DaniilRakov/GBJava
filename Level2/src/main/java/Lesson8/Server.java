@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Server {
 
@@ -48,11 +49,19 @@ public class Server {
         clients.forEach(client -> client.sendMessage(message));
     }
 
-    public synchronized void broadcastMessageToSeveralClients(String message, List<String> nicknames) {
+    public synchronized void broadcastToSeveralClients(String message, List<String> nicknames) {
         clients.forEach(clientHandler -> {
             if (nicknames.contains(clientHandler.getName()))
                 clientHandler.sendMessage(message);
         });
+    }
+
+    public synchronized void broadcastClientsList() {
+        String message = Constants.CLIENTS + " " + clients
+                .stream()
+                .map(ClientHandler::getName)
+                .collect(Collectors.joining(" "));
+        broadcastMessage(message);
     }
 
     public synchronized boolean directMessage(String message, String recipient) {
@@ -67,9 +76,11 @@ public class Server {
 
     public synchronized void unsubscribe(ClientHandler clientHandler) {
         clients.remove(clientHandler);
+        broadcastClientsList();
     }
 
     public synchronized void subscribe(ClientHandler clientHandler) {
         clients.add(clientHandler);
+        broadcastClientsList();
     }
 }

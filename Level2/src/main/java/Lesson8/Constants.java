@@ -7,6 +7,7 @@ public class Constants {
     static String AUTH = "/auth";
     static String AUTH_OK = "/auth_ok ";
     static String WHISPERING = "/w";
+    static String CLIENTS = "/clients";
     static String NO_USER = "Такого пользователя нет";
     static String GOOD_CONNECTION = "Подключение успешно";
     static String BAD_CONNECTION = "Не удалось подключиться к серверу";

@@ -12,6 +12,7 @@ import java.net.Socket;
 public class Client extends JFrame {
 
     private static String connectionMessage;
+    private static boolean authorized;
 
     private JTextField msgInputField;
     private JTextArea chatArea;
@@ -19,6 +20,14 @@ public class Client extends JFrame {
     private Socket socket;
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
+
+    public static boolean isAuthorized() {
+        return authorized;
+    }
+
+    public static void setAuthorized(boolean authorized) {
+        Client.authorized = authorized;
+    }
 
     public Client() {
         try {
@@ -39,16 +48,44 @@ public class Client extends JFrame {
         }
         inputStream = new DataInputStream(socket.getInputStream());
         outputStream = new DataOutputStream(socket.getOutputStream());
+        long startTime = System.currentTimeMillis();
 
-        // Поток чтения сообщений
+        // поток отключения неавторизованных пользователей
+        new Thread(() -> {
+            while (true) {
+                if (isAuthorized()) break;
+
+                if (System.currentTimeMillis() - startTime > 120000 && !isAuthorized()) {
+                    chatArea.append("Соединение разорвано из-за простаивания");
+                    closeConnection();
+                    break;
+                }
+            }
+        }).start();
+
+        // поток чтения сообщений
         new Thread(() -> {
             try {
+                // аутентификация
                 while (true) {
                     String strFromServer = inputStream.readUTF();
                     chatArea.append(strFromServer + "\n");
-                    if (strFromServer.toLowerCase().startsWith(Constants.STOP_WORD)) {
+                    if (strFromServer.toLowerCase().startsWith(Constants.AUTH_OK)) {
+                        setAuthorized(true);
                         break;
                     }
+                }
+                // чтение
+                while (true) {
+                    String strFromServer = inputStream.readUTF();
+                    if (strFromServer.toLowerCase().startsWith(Constants.STOP_WORD)) {
+                        break;
+                    } else if (strFromServer.toLowerCase().startsWith(Constants.CLIENTS)) {
+                        chatArea.append("Сейчас онлайн:" + strFromServer.replaceFirst(Constants.CLIENTS, ""));
+                    } else {
+                        chatArea.append(strFromServer);
+                    }
+                    chatArea.append("\n");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -90,19 +127,19 @@ public class Client extends JFrame {
     }
 
     public void prepareGUI() {
-        // Параметры окна
+        // параметры окна
         setBounds(600, 300, 500, 500);
         setTitle("Клиент");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        // Текстовое поле для вывода сообщений
+        // текстовое поле для вывода сообщений
         chatArea = new JTextArea();
         chatArea.setEditable(false);
         chatArea.setLineWrap(true);
         add(new JScrollPane(chatArea), BorderLayout.CENTER);
         chatArea.append(connectionMessage + "\n");
 
-        // Нижняя панель с полем для ввода сообщений и кнопкой отправки сообщений
+        // нижняя панель с полем для ввода сообщений и кнопкой отправки сообщений
         JPanel bottomPanel = new JPanel(new BorderLayout());
         JButton btnSendMsg = new JButton("Отправить");
         bottomPanel.add(btnSendMsg, BorderLayout.EAST);
@@ -112,7 +149,7 @@ public class Client extends JFrame {
         btnSendMsg.addActionListener(e -> sendMessage());
         msgInputField.addActionListener(e -> sendMessage());
 
-        // Настраиваем действие на закрытие окна
+        // настраиваем действие на закрытие окна
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
