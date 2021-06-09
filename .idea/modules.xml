@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/GBJava.iml" filepath="$PROJECT_DIR$/.idea/GBJava.iml" />
       <module fileurl="file://$PROJECT_DIR$/Level2/Level2.iml" filepath="$PROJECT_DIR$/Level2/Level2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Level3/Level3.iml" filepath="$PROJECT_DIR$/Level3/Level3.iml" />
     </modules>
   </component>
 </project>
