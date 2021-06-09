@@ -1,19 +1,20 @@
 package Lesson1;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class ArrayConverter<T> {
 
     private final T[] array;
-    private ArrayList<T> arrayList;
+    private List<T> list;
 
     public T[] getArray() {
         return array;
     }
 
-    public ArrayList<T> getArrayList() {
-        return arrayList;
+    public List<T> getList() {
+        return list;
     }
 
     public ArrayConverter(T[] array) {
@@ -27,7 +28,7 @@ public class ArrayConverter<T> {
     }
 
     public void convertArrayToArrayList() {
-        arrayList = new ArrayList<>();
-        Collections.addAll(arrayList, array);
+        list = new ArrayList<>();
+        Collections.addAll(list, array);
     }
 }

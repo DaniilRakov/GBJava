@@ -1,9 +1,10 @@
 package Lesson1;
 
+import java.util.List;
 import java.util.ArrayList;
 
 public class Box<T extends Fruit> {
-    private final ArrayList<T> fruits;
+    private final List<T> fruits;
 
     public Box() {
         fruits = new ArrayList<>();
@@ -17,7 +18,7 @@ public class Box<T extends Fruit> {
         return fruits.size() > 0 ? (long) fruits.size() * fruits.get(0).getWeight() : 0;
     }
 
-    public boolean compare(Box<?> box) {
+    public boolean compare(Box<? extends Fruit> box) {
         return this.getWeight() == box.getWeight();
     }
 

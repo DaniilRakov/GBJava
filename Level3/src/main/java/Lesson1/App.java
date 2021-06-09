@@ -24,7 +24,7 @@ public class App {
 
         // 2 задание
         arrConvStr.convertArrayToArrayList();
-        List<String> newList = arrConvStr.getArrayList();
+        List<String> newList = arrConvStr.getList();
 
         // 3 задание
         Apple apple = new Apple();
