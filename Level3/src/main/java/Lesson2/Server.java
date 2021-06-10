@@ -18,7 +18,7 @@ public class Server {
 
     public Server() {
         try (ServerSocket server = new ServerSocket(Constants.SERVER_PORT)) {
-            authService = new BaseAuthService();
+            authService = new DbAuthService();
             authService.start();
             clients = new ArrayList<>();
             while (true) {
