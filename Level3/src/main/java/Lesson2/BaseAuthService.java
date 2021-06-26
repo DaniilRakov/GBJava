@@ -7,12 +7,16 @@ public class BaseAuthService implements AuthService {
     private static class Entry {
         private final String login;
         private final String pass;
-        private final String nick;
+        private String nickname;
 
         public Entry(String login, String pass, String nick) {
             this.login = login;
             this.pass = pass;
-            this.nick = nick;
+            this.nickname = nick;
+        }
+
+        public void setNickname(String newNickname) {
+            nickname = newNickname;
         }
     }
 
@@ -39,8 +43,19 @@ public class BaseAuthService implements AuthService {
     @Override
     public String getNickByLoginPass(String login, String pass) {
         for (Entry entry : entries) {
-            if (entry.login.equals(login) && entry.pass.equals(pass)) return entry.nick;
+            if (entry.login.equals(login) && entry.pass.equals(pass)) return entry.nickname;
         }
         return null;
+    }
+
+    @Override
+    public boolean updateNick(String oldNickname, String newNickname) {
+        for (Entry entry : entries) {
+            if (entry.nickname.equals(oldNickname)) {
+                entry.setNickname(newNickname);
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -38,7 +38,7 @@ public class Server {
 
     public synchronized boolean isNickBusy(String nick) {
         for (ClientHandler clientHandler : clients) {
-            if (clientHandler.getName().equals(nick)) {
+            if (clientHandler.getMyNickname().equals(nick)) {
                 return true;
             }
         }
@@ -51,7 +51,7 @@ public class Server {
 
     public synchronized void broadcastToSeveralClients(String message, List<String> nicknames) {
         clients.forEach(clientHandler -> {
-            if (nicknames.contains(clientHandler.getName()))
+            if (nicknames.contains(clientHandler.getMyNickname()))
                 clientHandler.sendMessage(message);
         });
     }
@@ -59,14 +59,14 @@ public class Server {
     public synchronized void broadcastClientsList() {
         String message = Constants.CLIENTS + " " + clients
                 .stream()
-                .map(ClientHandler::getName)
+                .map(ClientHandler::getMyNickname)
                 .collect(Collectors.joining(" "));
         broadcastMessage(message);
     }
 
     public synchronized boolean directMessage(String message, String recipient) {
         for (ClientHandler clientHandler : clients) {
-            if (clientHandler.getName().equals(recipient)) {
+            if (clientHandler.getMyNickname().equals(recipient)) {
                 clientHandler.sendMessage(message);
                 return true;
             }
@@ -82,5 +82,9 @@ public class Server {
     public synchronized void subscribe(ClientHandler clientHandler) {
         clients.add(clientHandler);
         broadcastClientsList();
+    }
+
+    public void updateNick(String oldNickname, String newNickname) {
+        authService.updateNick(oldNickname, newNickname);
     }
 }

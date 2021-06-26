@@ -82,6 +82,8 @@ public class Client extends JFrame {
                         break;
                     } else if (strFromServer.toLowerCase().startsWith(Constants.CLIENTS)) {
                         chatArea.append("Сейчас онлайн:" + strFromServer.replaceFirst(Constants.CLIENTS, ""));
+                    } else if (strFromServer.toLowerCase().startsWith(Constants.CHANGE_NICKNAME)) {
+                        chatArea.append(strFromServer);
                     } else {
                         chatArea.append(strFromServer);
                     }

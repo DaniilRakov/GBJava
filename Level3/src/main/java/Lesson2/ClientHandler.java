@@ -11,10 +11,10 @@ public class ClientHandler {
     private final DataInputStream inputStream;
     private final DataOutputStream outputStream;
 
-    private String name;
+    private String myNickname;
 
-    public String getName() {
-        return name;
+    public String getMyNickname() {
+        return myNickname;
     }
 
     public ClientHandler(Server server, Socket socket) {
@@ -23,7 +23,7 @@ public class ClientHandler {
             this.socket = socket;
             this.inputStream = new DataInputStream(socket.getInputStream());
             this.outputStream = new DataOutputStream(socket.getOutputStream());
-            this.name = "";
+            this.myNickname = "";
             new Thread(() -> {
                 try {
                     authentication();
@@ -44,12 +44,12 @@ public class ClientHandler {
             String str = inputStream.readUTF();
             if (str.toLowerCase().startsWith(Constants.AUTH)) {
                 String[] parts = str.split("\\s");
-                String nick = server.getAuthService().getNickByLoginPass(parts[1], parts[2]);
-                if (nick != null) {
-                    if (!server.isNickBusy(nick)) {
-                        sendMessage(Constants.AUTH_OK + nick);
-                        name = nick;
-                        server.broadcastMessage(name + " вошёл в чат");
+                String nickname = server.getAuthService().getNickByLoginPass(parts[1], parts[2]);
+                if (nickname != null) {
+                    if (!server.isNickBusy(nickname)) {
+                        sendMessage(Constants.AUTH_OK + nickname);
+                        myNickname = nickname;
+                        server.broadcastMessage(myNickname + " вошёл в чат");
                         server.subscribe(this);
                         return;
                     } else {
@@ -65,18 +65,27 @@ public class ClientHandler {
     public void readMessages() throws IOException {
         while (true) {
             String strFromClient = inputStream.readUTF();
-            System.out.println(name + ": " + strFromClient);
+            System.out.println(myNickname + ": " + strFromClient);
 
             if (strFromClient.toLowerCase().startsWith(Constants.STOP_WORD)) return;
 
+            if (strFromClient.toLowerCase().startsWith(Constants.CHANGE_NICKNAME)) {
+                String[] parts = strFromClient.split("\\s");
+                String newNickname = strFromClient.substring(parts[0].length() + 1);
+                server.updateNick(myNickname, newNickname);
+                server.broadcastMessage("[" + myNickname + "]  сменил никнейм на  [" + newNickname + "]");
+                myNickname = newNickname;
+                continue;
+            }
+
             if (strFromClient.toLowerCase().startsWith(Constants.WHISPERING)) {
                 String[] parts = strFromClient.split("\\s");
-                String message = strFromClient.substring(3 + parts[1].length());
-                String fullMessage = "[" + name + "] шепчет [" + parts[1] + "]:" + message;
+                String message = strFromClient.substring(parts[0].length() + 1 + parts[1].length());
+                String fullMessage = "[" + myNickname + "] шепчет [" + parts[1] + "]: " + message;
                 boolean sendSuccess = server.directMessage(fullMessage, parts[1]);
                 sendMessage(sendSuccess ? fullMessage : Constants.NO_USER);
             } else
-                server.broadcastMessage("[" + name + "]:  " + strFromClient);
+                server.broadcastMessage("[" + myNickname + "]:  " + strFromClient);
         }
     }
 
@@ -89,7 +98,7 @@ public class ClientHandler {
     }
 
     public void closeConnection() {
-        server.broadcastMessage(name + " вышел из чата");
+        server.broadcastMessage(myNickname + " вышел из чата");
         server.unsubscribe(this);
         try {
             inputStream.close();
